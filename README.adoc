@@ -1,10 +1,8 @@
-= vscode-shards-syntax
-
-image:https://img.shields.io/badge/license-BSD%203--Clause-blue.svg[License: BSD 3-Clause, link=LICENSE]
+= vscode-shards-syntax image:https://img.shields.io/badge/license-BSD%203--Clause-blue.svg[License: BSD 3-Clause, link=LICENSE] =
 
 Syntax highlighting for https://github.com/fragcolor-xyz/shards[Shards] in VS Code.
 
-== Install
+== Install ==
 
 Grab it from the link:https://marketplace.visualstudio.com/items?itemName=fragcolor.shards-syntax[VS Code Marketplace], or issue the command:
 ```
@@ -12,7 +10,7 @@ code --install-extension fragcolor.shards-syntax
 ```
 You could also copy this repo to `<user home>/.vscode/extensions` folder and restart VS Code.
 
-== What's in the folder
+== What's in the folder ==
 
 This folder contains all of the files necessary for your extension:
 
@@ -20,13 +18,13 @@ This folder contains all of the files necessary for your extension:
 - `shards.tmLanguage.json` - this is the Text mate grammar file that is used for tokenization, generated from `shards.tmLanguage.edn`.
 - `language-configuration.json` - this is the language configuration, defining the tokens that are used for comments and brackets.
 
-== Get up and running straight away
+== Get up and running straight away ==
 
 . Go to _Run_ *->* _Start Debugging_ to open a new window with your extension loaded.
 . Open `shards1.shs` or `shards2.shs` file in this repo.
 . Verify that syntax highlighting works and that the language configuration settings are working.
 
-== Making changes
+== Making changes ==
 
 When making changes to `shards.tmLanguage.edn`, generate `shards.tmLanguage.json` using a tool like link:https://github.com/borkdude/jet[jet], here as:
 ```bash
@@ -35,14 +33,14 @@ cat shards.tmLanguage.edn |jet --to=json > shards.tmLanguage.json
 
 Reload (`Ctrl+R` or `Cmd+R` on Mac) the VS Code window with your extension to load your changes. Otherwise, relaunch the extension from the debug toolbar.
 
-== Inspecting tokens and scopes
+== Inspecting tokens and scopes ==
 
 In VS Code command palette, run `Developer: Inspect Editor Tokens and Scopes` to inspect the tokens and scopes of the current cursor position.
 
-== Publish this extension
+== Publish this extension ==
 
 To share this extension with the world, read on about https://code.visualstudio.com/api/working-with-extensions/publishing-extension[publishing an extension].
 
-== link:LICENSE[License]
+== link:LICENSE[License] ==
 
 _vscode-shards-syntax_ source code is licensed under the link:./LICENSE[BSD 3-Clause license].
