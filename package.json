@@ -1,0 +1,39 @@
+{
+  "name": "shards-syntax",
+  "displayName": "Shards Syntax Highlighter",
+  "description": "Syntax highlighting for Shards",
+  "author": "Fragcolor and contributors",
+  "url": "https://github.com/fragcolor-xyz/vscode-shards-syntax",
+  "license": "BSD-3-Clause",
+  "version": "0.0.5",
+  "icon": "logo.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fragcolor-xyz/vscode-shards-syntax.git"
+  },
+  "publisher": "fragcolor",
+  "engines": {
+    "vscode": "^1.79.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "shards",
+      "aliases": ["Shards", "shards"],
+      "extensions": [".shs"],
+      "configuration": "./language-configuration.json"
+    }],
+    "configurationDefaults": {
+      "[shards]": {
+          "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
+      }
+    },
+    "grammars": [{
+      "language": "shards",
+      "scopeName": "source.shards",
+      "path": "./shards.tmLanguage.json"
+    }]
+  }
+}
