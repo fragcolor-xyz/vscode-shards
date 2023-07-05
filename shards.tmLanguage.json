@@ -8,6 +8,10 @@
   }, {
     "include" : "#assignments"
   }, {
+    "include" : "#enums"
+  }, {
+    "include" : "#parameters"
+  }, {
     "include" : "#shards"
   }, {
     "include" : "#literals"
@@ -17,21 +21,9 @@
     "include" : "#strings"
   } ],
   "repository" : {
-    "comments" : {
-      "name" : "comment.line.semicolon.shards",
-      "match" : ";.*"
-    },
-    "commas" : {
-      "name" : "punctuation.separator.comma.shards",
-      "match" : ","
-    },
     "assignments" : {
       "name" : "keyword.operator.assignment.shards",
       "match" : "=|>|>=|>>|>>=|>>!"
-    },
-    "shards" : {
-      "name" : "entity.name.type.class",
-      "match" : "(@[a-z]|[A-Z])[a-zA-Z0-9_.-]*"
     },
     "literals" : {
       "patterns" : [ {
@@ -44,10 +36,6 @@
         "name" : "constant.language.null.shards",
         "match" : "\\b(none)\\b"
       } ]
-    },
-    "variables" : {
-      "name" : "variable.other.readwrite.shards",
-      "match" : "[a-z_][a-zA-Z0-9_-]*"
     },
     "strings" : {
       "patterns" : [ {
@@ -67,6 +55,30 @@
           "match" : "\\\\."
         } ]
       } ]
+    },
+    "comments" : {
+      "name" : "comment.line.semicolon.shards",
+      "match" : ";.*"
+    },
+    "commas" : {
+      "name" : "punctuation.separator.comma.shards",
+      "match" : ","
+    },
+    "variables" : {
+      "name" : "variable.other.readwrite.shards",
+      "match" : "[a-z_][a-zA-Z0-9_.-]*"
+    },
+    "shards" : {
+      "name" : "entity.name.type.class.shards",
+      "match" : "(@[a-z]|[A-Z])[a-zA-Z0-9_.-]*"
+    },
+    "enums" : {
+      "name" : "support.function.shards",
+      "match" : "\\b([A-Z][a-zA-Z0-9_]*::[A-Z][a-zA-Z0-9_]*)\\b"
+    },
+    "parameters" : {
+      "name" : "keyword.control.shards",
+      "match" : "\\b[A-Z][A-Za-z0-9-._]*:"
     }
   },
   "scopeName" : "source.shards"
