@@ -58,3 +58,6 @@ My_Type64::My_Constructor64
 
 ; shard with explicit parameter
 Math.Add(My_explicit-namespaced.parameter2: 2)
+
+; a function name with forward slash separator in the name
+@rare/has-tags("transparent" tags)

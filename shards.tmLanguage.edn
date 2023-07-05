@@ -20,7 +20,7 @@
               :parameters {:name "keyword.control.shards"
                            :match "\\b[A-Z][A-Za-z0-9-._]*:"}
               :shards {:name "entity.name.type.class.shards"
-                       :match "(@[a-z]|[A-Z])[a-zA-Z0-9_.-]*"}
+                       :match "(@[a-z]|[A-Z])[a-zA-Z0-9_./-]*"}
               :literals {:patterns [{:name "constant.language.boolean.shards"
                                      :match "\\b(true|false)\\b"}
                                     {:name "constant.numeric.shards"
