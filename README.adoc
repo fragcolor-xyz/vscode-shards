@@ -76,10 +76,12 @@ To go to CLJS-land, I found it easiest to:
 
 1. Stop debugging
 2. Add a dependency to `shadow-cljs.edn`:
-    ```clojure
-    :dependencies [[cider/cider-nrepl "0.21.0"]]
-    ```
-3. Write the following in a terminal (if in VSCode, preferably the one you start debugging from):
+[code, clojure]
+----
+:dependencies [[cider/cider-nrepl "0.21.0"]]
+----
+
+1. Write the following in a terminal (if in VSCode, preferably the one you start debugging from):
 [code, bash]
 ----
 $ shadow-cljs clj-repl

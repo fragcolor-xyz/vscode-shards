@@ -5,3 +5,4 @@ node_modules/
 .lsp
 .shadow-cljs
 package-lock.json
+*.vsix

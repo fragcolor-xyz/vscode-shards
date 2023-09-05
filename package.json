@@ -1,9 +1,20 @@
 {
 	"name": "shards",
-	"description": "Shards language support",
+	"displayName": "Shards language support",
+	"description": "vscode-shards will provide comprehensive support for the Shards programming language",
 	"version": "0.0.1",
-	"publisher": "fragcolor.com",
-	"repository": "https://github.com/fragcolor-xyz/vscode-shards",
+	"publisher": "fragcolor",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/fragcolor-xyz/vscode-shards.git"
+	},
+	"url": "https://github.com/fragcolor-xyz/vscode-shards",
+	"author": "Fragcolor and contributors",
+	"license": "BSD-3-Clause",
+	"icon": "logo.png",
+	"categories": [
+		"Programming Languages"
+	],
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -13,6 +24,6 @@
 	"main": "./out/extension.js",
 	"devDependencies": {
 		"@types/code": "^4.0.6",
-		"shadow-cljs": "^2.25.3"
+		"shadow-cljs": "^2.25.4"
 	}
 }

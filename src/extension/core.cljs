@@ -24,8 +24,8 @@
   (let [tmpdir (os/tmpdir)
         rand-ast-path (str/join "/" [tmpdir (gen-rand-ast-filename)])
         cmd (str/join " " ["cd" tmpdir ";" "shards" "ast" vscode/window.activeTextEditor.document.fileName "-o" rand-ast-path])]
-    (.exec cp cmd (fn [_] (->> rand-ast-path slurp json->clj (reset! ast)) 
-                          (fs/unlink rand-ast-path)))))
+    (.exec cp cmd (fn [_] (->> rand-ast-path slurp json->clj (reset! ast))
+                              (fs/unlink rand-ast-path)))))
 
 (defn ->location
   [^js doc a-range]
@@ -68,7 +68,8 @@
   (js-delete js/require.cache (js/require.resolve "./extension")))
 
 (defn activate [context]
-  (->ast)
+  ; FIXME delay hack because shards cannot be found immediately after extension activation
+  (js/setTimeout ->ast 2000)
   (let [doc-change-provider (vscode/workspace.onDidSaveTextDocument handle-change)
         definition-provider (vscode/languages.registerDefinitionProvider
                               "shards"
