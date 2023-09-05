@@ -1,12 +1,9 @@
 .calva/**
 .clj-kondo/**
-.git/**
 .gitignore
 .lsp/**
 .shadow-cljs/**
 .vscode/**
-node_modules/**
 samples/**
 shadow-cljs.edn
-*.vsix
 src
