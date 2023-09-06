@@ -2,7 +2,7 @@
 
 [Shards](https://github.com/fragcolor-xyz/shards) language Support in VSCode.
 
-The "vscode-shards" extension will provide comprehensive support for the Shards programming language in Visual Studio Code. Developed in `ClojureScript` and `tmLanguage`, the extension will offer:
+This extension will provide comprehensive support for the Shards programming language in Visual Studio Code. Developed in `ClojureScript` and `tmLanguage`, the extension will offer:
 
 - [x] Syntax highlighting
 - [x] Go to definitions
@@ -16,7 +16,7 @@ Grab it from the [VS Code Marketplace](https://marketplace.visualstudio.com/item
 ```
 code --install-extension fragcolor.shards
 ```
-You could also copy this repo or just the relevant files to `<user home>/.vscode/extensions` folder in VS Code. Check the relevant files with `vsce ls`.
+You could also copy this repo or just copy the relevant files to `<user home>/.vscode/extensions` folder in VS Code. Check the relevant files with `vsce ls`.
 
 ## Usage
 
@@ -35,11 +35,6 @@ npm install
 Continuously reload changes:
 ```bash
 shadow-cljs watch dev
-```
-
-Build code for release:
-```bash
-shadow-cljs release dev
 ```
 
 ### Debug extension
@@ -63,11 +58,22 @@ When making changes to `shards.tmLanguage.edn`, generate `shards.tmLanguage.json
 cat shards.tmLanguage.edn |jet --to=json > shards.tmLanguage.json
 ```
 
+Test code prior to release:
+```bash
+shadow-cljs release dev --debug
+```
+Useful to test if if you've got _uncaught_ errors from using advanced optimizations, which btw, is not an opt-in feature to get a standalone `out/extension.js` file. This is the same command you're going to use for the [publishing extension](#Publish-this-extension) process.
+
 #### Reload extension
 
 Reload (`Ctrl+R` or `Cmd+R` on Mac) the VS Code window with your extension to load your changes. Otherwise, relaunch the extension from the debug toolbar.
 
 ### Publish this extension
+
+Build code for release:
+```bash
+shadow-cljs release dev
+```
 
 Make sure you're going to publish the required and only the required files:
 ```
