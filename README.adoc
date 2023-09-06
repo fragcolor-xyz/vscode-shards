@@ -4,7 +4,7 @@ Shards Language Support in VSCode
 
 The "vscode-shards" extension will provide comprehensive support for the Shards programming language in Visual Studio Code. Developed in ClojureScript, the extension will offer:
 
-* [ ] syntax highlighting
+* [x] syntax highlighting
 * [x] Go to definitions
 * [ ] Go to references
 * [ ] Outline

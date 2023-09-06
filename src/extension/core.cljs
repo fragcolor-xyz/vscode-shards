@@ -20,15 +20,17 @@
 
 (def json->clj (comp #(js->clj % :keywordize-keys true) js/JSON.parse))
 
-(defn ->ast [languageId]
-  (when (= "shards-lang" languageId)
+(defn ->ast [_]
+  (when (= "shards" vscode/window.activeTextEditor.document.languageId)
     (let [shards-filename-path (.-path (vscode/workspace.getConfiguration "shards"))
           tmpdir (os/tmpdir)
           rand-ast-path (str/join "/" [tmpdir (gen-rand-ast-filename)])
-          cmd (str/join " " ["cd" tmpdir ";" shards-filename-path "ast" vscode/window.activeTextEditor.document.fileName "-o" rand-ast-path])]
-      (.exec cp cmd (fn [a b c] (println a b c)
-                                (->> rand-ast-path slurp json->clj (swap! ast assoc vscode/window.activeTextEditor.document.fileName))
-                                (fs/unlink rand-ast-path ( fn [err] (println err))))))))
+          cmd (str/join " " [shards-filename-path "ast" vscode/window.activeTextEditor.document.fileName "-o" rand-ast-path])]
+      (.exec cp cmd #js {:cwd tmpdir}
+             (fn [a b c]
+               (println a b c)
+               (->> rand-ast-path slurp json->clj (swap! ast assoc vscode/window.activeTextEditor.document.fileName))
+               (fs/unlink rand-ast-path (fn [err] (println err))))))))
 
 (defn ->location
   [doc a-range]
@@ -69,11 +71,11 @@
 
 (defn activate [context]
   (doto ^js (.-subscriptions context)
-    (.push (vscode/window.onDidChangeVisibleTextEditors (fn [_] (println "onDidChangeVisibleTextEditors") (->ast vscode/window.activeTextEditor.document.languageId))))
-    (.push (vscode/window.onDidChangeWindowState (fn [_] (println "onDidChangeWindowState") (->ast vscode/window.activeTextEditor.document.languageId))))
-    (.push (vscode/window.onDidChangeActiveTextEditor (fn [_] (println "onDidChangeActiveTextEditor") (->ast vscode/window.activeTextEditor.document.languageId))))
-    (.push (vscode/workspace.onDidSaveTextDocument (fn [_] (println "onDidSaveTextDocument") (->ast vscode/window.activeTextEditor.document.languageId))))
-    (.push (vscode/languages.registerDefinitionProvider "shards-lang" #js {:provideDefinition (handle-goto-def ast)}))))
+    (.push (vscode/window.onDidChangeVisibleTextEditors (fn [e] (println "onDidChangeVisibleTextEditors") (->ast e))))
+    (.push (vscode/window.onDidChangeActiveTextEditor (fn [e] (println "onDidChangeActiveTextEditor") (->ast e))))
+    (.push (vscode/window.onDidChangeWindowState (fn [e] (println "onDidChangeWindowState") (->ast e))))
+    (.push (vscode/workspace.onDidSaveTextDocument (fn [e] (println "onDidSaveTextDocument") (->ast e))))
+    (.push (vscode/languages.registerDefinitionProvider "shards" #js {:provideDefinition (handle-goto-def ast)}))))
 
 (defn deactivate [])
 

@@ -4,5 +4,4 @@
  :builds {:dev {:exports-var extension.core/exports
                 :target :node-library
                 :output-to "out/extension.js"
-                :js-provider :require
                 :devtools {:after-load extension.core/reload}}}}
