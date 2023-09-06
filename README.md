@@ -62,7 +62,7 @@ Test code prior to release:
 ```bash
 shadow-cljs release dev --debug
 ```
-Useful to test if if you've got _uncaught_ errors from using advanced optimizations, which btw, is not an opt-in feature to get a standalone `out/extension.js` file. This is the same command you're going to use for the [publishing extension](#Publish-this-extension) process.
+Useful to test if if you've got _uncaught_ errors from using advanced optimizations, which btw, is not an opt-in feature to get a standalone `out/extension.js` file.
 
 #### Reload extension
 
@@ -79,6 +79,19 @@ Make sure you're going to publish the required and only the required files:
 ```
 vsce ls
 ```
+As of writing, this is what we're publishing:
+```
+highlight/language-configuration.json
+highlight/shards.tmLanguage.edn
+highlight/shards.tmLanguage.json
+LICENSE
+logo.png
+out/extension.js
+out/extension.js.map
+package.json
+README.md
+```
+Unsure yet if the source map at `out/extension.js.map` is working.
 
 Bump the `version` number in `package.json` before publishing this extension, then
 ```bash
