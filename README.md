@@ -10,7 +10,7 @@ This extension will provide comprehensive support for the Shards programming lan
 - [ ] Go to references
 - [ ] Outline
 
-# Install extension
+## Install extension
 
 Grab it from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=fragcolor.shards), or issue the command:
 ```
@@ -93,7 +93,7 @@ README.md
 ```
 Unsure yet if the source map at `out/extension.js.map` is working.
 
-Bump the `version` number in `package.json` before publishing this extension, then
+Bump the `version` number in `package.json` before publishing this extension, then:
 ```bash
 vsce package
 ```
