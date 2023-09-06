@@ -1,3 +1,11 @@
+@wire(lip {
+  3 | Log
+})
+
+
+@wire(eggs {
+  2 | Log
+})
 
 @wire(foo {
   1 | Log
@@ -5,6 +13,7 @@
 
 @wire(bar {
   Do(foo)
+  Do(lip)
 })
 
 @mesh(main)

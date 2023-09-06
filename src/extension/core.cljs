@@ -20,15 +20,18 @@
 
 (def json->clj (comp #(js->clj % :keywordize-keys true) js/JSON.parse))
 
-(defn ->ast []
-  (let [tmpdir (os/tmpdir)
-        rand-ast-path (str/join "/" [tmpdir (gen-rand-ast-filename)])
-        cmd (str/join " " ["cd" tmpdir ";" "shards" "ast" vscode/window.activeTextEditor.document.fileName "-o" rand-ast-path])]
-    (.exec cp cmd (fn [_] (->> rand-ast-path slurp json->clj (reset! ast))
-                              (fs/unlink rand-ast-path)))))
+(defn ->ast [languageId]
+  (when (= "shards-lang" languageId)
+    (let [shards-filename-path (.-path (vscode/workspace.getConfiguration "shards"))
+          tmpdir (os/tmpdir)
+          rand-ast-path (str/join "/" [tmpdir (gen-rand-ast-filename)])
+          cmd (str/join " " ["cd" tmpdir ";" shards-filename-path "ast" vscode/window.activeTextEditor.document.fileName "-o" rand-ast-path])]
+      (.exec cp cmd (fn [a b c] (println a b c)
+                                (->> rand-ast-path slurp json->clj (swap! ast assoc vscode/window.activeTextEditor.document.fileName))
+                                (fs/unlink rand-ast-path ( fn [err] (println err))))))))
 
 (defn ->location
-  [^js doc a-range]
+  [doc a-range]
   #js {"range" a-range
        "uri" (.-uri doc)})
 
@@ -51,32 +54,26 @@
            :line_info))
 
 (defn handle-goto-def [ast]
-  (fn [^vscode/TextDocument doc pos _]
+  (fn [^js doc ^js pos _]
     (let [word-range (.getWordRangeAtPosition doc pos #"[a-z_][a-zA-Z0-9_.-]*")
           word (.getText doc word-range)
-          {:keys [line column]} (->wire-pos @ast word)]
+          {:keys [line column]} (->wire-pos (get @ast vscode/window.activeTextEditor.document.fileName) word)]
       (->location doc
                   (->range
                     {:start-pos {:line (dec line) :column (+ column 5)}
                      :end-pos {:line (dec line) :column (+ column 5 (count word))}})))))
-
-(defn handle-change [_]
-  (->ast))
 
 (defn reload []
   (.log js/console "Reloading...")
   (js-delete js/require.cache (js/require.resolve "./extension")))
 
 (defn activate [context]
-  ; FIXME delay hack because shards cannot be found immediately after extension activation
-  (js/setTimeout ->ast 2000)
-  (let [doc-change-provider (vscode/workspace.onDidSaveTextDocument handle-change)
-        definition-provider (vscode/languages.registerDefinitionProvider
-                              "shards"
-                              #js {:provideDefinition (handle-goto-def ast)})]
-    (doto context.subscriptions
-      (.push definition-provider)
-      (.push doc-change-provider))))
+  (doto ^js (.-subscriptions context)
+    (.push (vscode/window.onDidChangeVisibleTextEditors (fn [_] (println "onDidChangeVisibleTextEditors") (->ast vscode/window.activeTextEditor.document.languageId))))
+    (.push (vscode/window.onDidChangeWindowState (fn [_] (println "onDidChangeWindowState") (->ast vscode/window.activeTextEditor.document.languageId))))
+    (.push (vscode/window.onDidChangeActiveTextEditor (fn [_] (println "onDidChangeActiveTextEditor") (->ast vscode/window.activeTextEditor.document.languageId))))
+    (.push (vscode/workspace.onDidSaveTextDocument (fn [_] (println "onDidSaveTextDocument") (->ast vscode/window.activeTextEditor.document.languageId))))
+    (.push (vscode/languages.registerDefinitionProvider "shards-lang" #js {:provideDefinition (handle-goto-def ast)}))))
 
 (defn deactivate [])
 

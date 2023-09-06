@@ -1,8 +1,8 @@
 {
 	"name": "shards",
 	"displayName": "Shards language support",
-	"description": "vscode-shards will provide comprehensive support for the Shards programming language",
-	"version": "0.0.2",
+	"description": "Language support for the Shards programming language",
+	"version": "0.0.4",
 	"publisher": "fragcolor",
 	"repository": {
 		"type": "git",
@@ -18,15 +18,28 @@
 	"engines": {
 		"vscode": "^1.41.0"
 	},
-	"extensionDependencies": [
-		"fragcolor.shards-syntax"
-	],
 	"activationEvents": [
-		"onLanguage:shards"
+		"onLanguage:shards-lang"
 	],
+	"contributes": {
+		"configuration": {
+			"title": "Shards",
+			"properties": {
+				"shards.path": {
+					"type": "string",
+					"default": "/usr/local/bin/shards",
+					"description": "Full path to the 'shards' executable"
+				}
+			}
+		},
+		"languages": [{
+			"id": "shards-lang",
+			"aliases": ["Shards", "shards"],
+			"extensions": [".shs"]
+		}]
+	},
 	"main": "./out/extension.js",
 	"devDependencies": {
-		"@types/code": "^4.0.6",
 		"shadow-cljs": "^2.25.4"
 	}
 }
