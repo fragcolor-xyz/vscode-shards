@@ -10,8 +10,8 @@ This extension will provide comprehensive support for the Shards programming lan
   - [x] Wires
     - [x] Cross-file
   - [ ] Variables
-  - [ ] @define
-  - [ ] @template
+  - [x] @define
+  - [x] @template
 - [ ] Go to references
 - [x] Outline
   - [ ] Meshes with go to definitions
