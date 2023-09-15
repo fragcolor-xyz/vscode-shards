@@ -35,17 +35,20 @@
                    (reject error)
                    (resolve {:stdout b :stderr c})))))))
 
-(defn ->location
-  [uri a-range]
-  #js {"range" a-range
-       "uri" uri})
+(def at-conf {:wire {:emoji "🔗" :rshift 5}
+              :template {:emoji "📄" :rshift 9}
+              :define {:emoji "🔤" :rshift 7}
+              :macro {:emoji "🤖" :rshift 6}
+              :mesh {:emoji "🪢" :rshift 5}})
 
-(defn ->range [{:keys [start-pos end-pos]}]
-  (new vscode/Range
-       (:line start-pos)
-       (:column start-pos)
-       (:line end-pos)
-       (:column end-pos)))
+(defn ->location [{:keys [line column]} path kind definition]
+  (let [def-rshift (-> at-conf kind :rshift)]
+    {:range {:start-pos {:line (dec line) :column (+ column def-rshift)}
+             :end-pos {:line (dec line) :column (+ column def-rshift (count definition))}}
+     :path path}))
+
+(defn ->label [kind definition]
+  (str (-> at-conf kind :emoji) " " definition))
 
 (defn ->ast-blocks [ast]
   (some->> ast :sequence :statements (mapcat (comp :blocks :Pipeline))))
@@ -59,43 +62,25 @@
           (some->> (if-let [program (some-> init-block :content :Program)]
                      (->ast-blocks program)
                      [init-block])
-                   (filter #(#{"wire" "template" "define"} (some-> % :content :Func :name :name)))
-                   (map #(let [def-key (-> % :content :Func :name :name (keyword))
-                               def-val (->> % :content :Func :params (keep (comp :name :Identifier :value)) (first))]
-                           (hash-map
-                             def-key def-val
-                             :line-info (:line_info %)
-                             :path path))))))
+                   (keep #(when-let [kind (some-> (#{"wire" "template" "define" "macro" "mesh"} (some-> % :content :Func :name :name)) (keyword))]
+                            (let [definition (->> % :content :Func :params (keep (comp :name :Identifier :value)) (first))]
+                              (hash-map :definition definition
+                                        :label (->label kind definition)
+                                        :location (->location (:line_info %) path kind definition))))))))
       init-blocks)))
-
-(defn ->def-location [{:keys [path wire template define line-info]}]
-  (let [def-val (or wire template define)
-        def-rshift (cond wire 5 template 9 define 7)
-        {:keys [line column]} line-info]
-    {:definition def-val
-     :location {:range {:start-pos {:line (dec line) :column (+ column def-rshift)}
-                        :end-pos {:line (dec line) :column (+ column def-rshift (count wire))}}
-                :path path}}))
-
-(defn ->def-locations [ast]
-  (map ->def-location (->defs-ast-info ast)))
-
-(defn ->definition [{:keys [definition location]}]
-  {:label definition
-   :location location})
-
-(defn ->outline-items [locations]
-  (map ->definition locations))
 
 (defn ->vscode-location [{:keys [path range]}]
   (let [uri (vscode/Uri.file path)
         {:keys [start-pos end-pos]} range]
-    (->location uri
-                (->range {:start-pos start-pos
-                          :end-pos end-pos}))))
+    #js {"uri" uri
+         "range" (new vscode/Range
+                      (:line start-pos)
+                      (:column start-pos)
+                      (:line end-pos)
+                      (:column end-pos))}))
 
-(defn reveal-location [^js location]
-  (let [vscode-location (-> location (js->clj :keywordize-keys true) (->vscode-location))
+(defn reveal-location [location]
+  (let [vscode-location (->vscode-location location)
         uri vscode-location.uri]
     (-> uri
         vscode/workspace.openTextDocument
@@ -111,10 +96,8 @@
   #js {:getTreeItem identity
        :getParent (fn [_] nil)
        :onDidChangeTreeData treeDataEventEmitter.event
-       :getChildren (fn []
-                      (when-let [doc (some-> vscode/window.activeTextEditor .-document)]
-                        (let [locations (get-in @ast [doc.fileName :locations])]
-                          (clj->js (->outline-items locations)))))})
+       :getChildren #(when-let [doc (some-> vscode/window.activeTextEditor .-document)]
+                       (clj->js (get-in @ast [doc.fileName :definitions])))})
 
 (def view-options
   #js {:treeDataProvider outline-provider})
@@ -136,7 +119,7 @@
                            (when (fs/existsSync rand-ast-path)
                              (swap! ast assoc-in [doc.fileName :code-hash] (hash text))
                              (let [ast-edn (-> rand-ast-path slurp json->clj)]
-                               (->> ast-edn (->def-locations) (swap! ast assoc-in [doc.fileName :locations])))
+                               (->> ast-edn (->defs-ast-info) (swap! ast assoc-in [doc.fileName :definitions])))
                              (.fire ^js treeDataEventEmitter)
                              (unlink rand-ast-path))))
                   (.then (fn [err] (some-> err println)))))))))
@@ -146,18 +129,15 @@
     (when doc
       (let [word-range (.getWordRangeAtPosition doc pos #"[a-z_][a-zA-Z0-9_.-]*")
             word (.getText doc word-range)
-            locations (get-in @ast [doc.fileName :locations])]
-        (->> locations
+            definitions (get-in @ast [doc.fileName :definitions])]
+        (->> definitions
              (ffilter #(= word (:definition %)))
              :location
              (->vscode-location))))))
 
 (defn handle-change-selection [selection]
   (println "onDidChangeSelection" selection)
-  (let [items (.-selection selection)
-        item (aget items "0")
-        location (.-location item)]
-    (reveal-location location)))
+  (reveal-location (-> selection (js->clj :keywordize-keys true) :selection (first) :location)))
 
 (defn reload []
   (.log js/console "Reloading...")

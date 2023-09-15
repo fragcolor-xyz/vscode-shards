@@ -12,9 +12,11 @@ This extension will provide comprehensive support for the Shards programming lan
   - [ ] Variables
   - [x] @define
   - [x] @template
+  - [x] macro
+  - [x] mesh
 - [ ] Go to references
 - [x] Outline
-  - [ ] Meshes with go to definitions
+  - [x] Meshes with go to definitions
   - [x] Wire definitions with go to definitions
     - [ ] Variable definitions with go definitions
     - [ ] Wire references (activator type too?) with go to definitions
