@@ -55,10 +55,10 @@
 
 (defn ->defs-ast-info [ast]
   (let [init-blocks (->ast-blocks ast)
-        activeDoc (some-> vscode/window.activeTextEditor .-document)]
+        main-filename (-> ast :sequence :metadata :name)]
     (mapcat
       (fn [init-block]
-        (let [path (or (some-> init-block :content :Program :metadata :name) (some-> activeDoc .-fileName))]
+        (let [path (or (some-> init-block :content :Program :metadata :name) main-filename)]
           (some->> (if-let [program (some-> init-block :content :Program)]
                      (->ast-blocks program)
                      [init-block])
