@@ -20,13 +20,13 @@
               :parameters {:name "keyword.control.shards"
                            :match "\\b[A-Z][A-Za-z0-9-._]*:"}
               :shards {:name "entity.name.type.class.shards"
-                       :match "(@[a-z]|[A-Z])[a-zA-Z0-9_./-]*"}
+                       :match "(@[a-z]|_?[A-Z])[a-zA-Z0-9_./-]*"}
               :literals {:patterns [{:name "constant.language.boolean.shards"
                                      :match "\\b(true|false)\\b"}
                                     {:name "constant.numeric.shards"
                                      :match "\\b(0x[a-fA-F0-9]+|\\d+)\\b"}
                                     {:name "constant.language.null.shards"
-                                     :match "\\b(none)\\b"}]}
+                                     :match "\\b(none|null)\\b"}]}
               :variables {:name "variable.other.readwrite.shards"
                           :match "[a-z_][a-zA-Z0-9_.-]*"}
               :strings {:patterns [{:name "string.quoted.double.shards"

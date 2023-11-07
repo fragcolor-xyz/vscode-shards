@@ -34,7 +34,7 @@
         "match" : "\\b(0x[a-fA-F0-9]+|\\d+)\\b"
       }, {
         "name" : "constant.language.null.shards",
-        "match" : "\\b(none)\\b"
+        "match" : "\\b(none|null)\\b"
       } ]
     },
     "strings" : {
@@ -70,7 +70,7 @@
     },
     "shards" : {
       "name" : "entity.name.type.class.shards",
-      "match" : "(@[a-z]|[A-Z])[a-zA-Z0-9_./-]*"
+      "match" : "(@[a-z]|_?[A-Z])[a-zA-Z0-9_./-]*"
     },
     "enums" : {
       "name" : "support.function.shards",
