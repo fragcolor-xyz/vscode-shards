@@ -1,39 +1,73 @@
 {
   "name": "shards-syntax",
-  "displayName": "Shards Syntax Highlighter",
-  "description": "Syntax highlighting for Shards",
-  "author": "Fragcolor and contributors",
+	"displayName": "Shards language support",
+	"description": "Language support for the Shards programming language.",
+	"publisher": "fragcolor",
   "url": "https://github.com/fragcolor-xyz/vscode-shards-syntax",
   "license": "BSD-3-Clause",
-  "version": "0.0.8",
+  "version": "0.0.13",
   "icon": "logo.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/fragcolor-xyz/vscode-shards-syntax.git"
   },
-  "publisher": "fragcolor",
   "engines": {
-    "vscode": "^1.79.0"
+    "vscode": "^1.84.0"
   },
   "categories": [
     "Programming Languages"
   ],
   "contributes": {
-    "languages": [{
-      "id": "shards",
-      "aliases": ["Shards", "shards"],
-      "extensions": [".shs"],
-      "configuration": "./language-configuration.json"
-    }],
+		"configuration": {
+			"title": "SHLang Binary",
+			"properties": {
+				"shards.path": {
+					"type": "string",
+					"default": "/usr/local/bin/shards",
+					"description": "Full path to the 'shlang' executable"
+				}
+			}
+		},
+    "languages": [
+      {
+        "id": "shards",
+        "aliases": ["Shards", "shards"],
+        "extensions": [".shs"],
+        "configuration": "./highlight/language-configuration.json"
+      }
+    ],
     "configurationDefaults": {
       "[shards]": {
-          "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",<>/?"
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",<>/?"
       }
     },
-    "grammars": [{
-      "language": "shards",
-      "scopeName": "source.shards",
-      "path": "./shards.tmLanguage.json"
-    }]
+    "grammars": [
+      {
+        "language": "shards",
+        "scopeName": "source.shards",
+        "path": "./highlight/shards.tmLanguage.json"
+      }
+    ]
+  },
+  "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.84.0",
+    "@types/mocha": "^10.0.3",
+    "@types/node": "18.x",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "eslint": "^8.52.0",
+    "glob": "^10.3.10",
+    "mocha": "^10.2.0",
+    "typescript": "^5.2.2",
+    "@vscode/test-electron": "^2.3.6"
   }
 }
