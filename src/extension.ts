@@ -6,19 +6,20 @@ import path from 'node:path';
 import * as net from 'net';
 
 import {
+	DidChangeConfigurationNotification,
 	LanguageClient,
 	LanguageClientOptions,
 	ServerOptions,
 	StreamInfo,
-	TransportKind
+	TransportKind,
+	integer
 } from 'vscode-languageclient/node';
 import { Socket } from 'dgram';
 
 var outputChannel: vscode.OutputChannel;
 let client: LanguageClient;
 
-function connectToSocket(): Promise<StreamInfo> {
-	let port = 7777;
+function connectToSocket(port: integer): Promise<StreamInfo> {
 	return new Promise((resolve, reject) => {
 		outputChannel.appendLine(`Connecting to server on port ${port}`);
 		const client = net.connect({ port: port }, () => {
@@ -36,25 +37,40 @@ function connectToSocket(): Promise<StreamInfo> {
 }
 
 export async function start_language_client() {
-	let shardsPath = vscode.workspace.getConfiguration("shards").get<string>("path");
-	if (shardsPath) {
+	// Options to control the language client
+	let clientOptions: LanguageClientOptions = {
+		// workspaceFolder: {}
+		// Register the server for plain text documents
+		documentSelector: [{ scheme: 'file', language: 'shards' }],
+		synchronize: {
+			// Notify the server about file changes to '.clientrc files contained in the workspace
+			fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
+		},
+		outputChannel: outputChannel,
+	};
+
+	let serverOptions: ServerOptions | undefined;
+	let config = vscode.workspace.getConfiguration("shards");
+	let shardsPath = config.get<string>("path");
+	let port = config.get<integer>("langServer.port");
+	if (port) {
+		outputChannel.appendLine(`Connecting to language server on port ${port}`);
+
+		// If the extension is launched in debug mode then the debug server options are used
+		// Otherwise the run options are used
+		serverOptions = () => connectToSocket(port!);
+
+	} else if (shardsPath) {
 		outputChannel.appendLine(`Using shards path: ${shardsPath}`);
 
 		// If the extension is launched in debug mode then the debug server options are used
 		// Otherwise the run options are used
-		let serverOptions: ServerOptions = () => connectToSocket();
-
-		// Options to control the language client
-		let clientOptions: LanguageClientOptions = {
-			// Register the server for plain text documents
-			documentSelector: [{ scheme: 'file', language: 'shards' }],
-			synchronize: {
-				// Notify the server about file changes to '.clientrc files contained in the workspace
-				fileEvents: vscode.workspace.createFileSystemWatcher('**/.clientrc')
-			},
-			outputChannel: outputChannel,
+		serverOptions = {
+			command: shardsPath, args: ['lsp'], transport: TransportKind.stdio
 		};
+	}
 
+	if (serverOptions) {
 		// Create the language client and start the client.
 		client = new LanguageClient(
 			'shards',
@@ -142,6 +158,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 	await start_language_client();
 	context.subscriptions.push(
 		vscode.commands.registerCommand('shards.restartLangServer', restartServer)
+	);
+
+
+	vscode.workspace.onDidChangeConfiguration(
+		async (_) => {
+			if (client) {
+				await client?.sendNotification(DidChangeConfigurationNotification.type, {
+					settings: "",
+				});
+			}
+		},
+		null, undefined
 	);
 }
 

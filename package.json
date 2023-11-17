@@ -31,6 +31,23 @@
           "type": "string",
           "default": "/usr/local/bin/shards",
           "description": "Full path to the 'shlang' executable"
+        },
+        "shards.langServer.port": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "default": null,
+          "description": "The port to use to connect to a running language server"
+        },
+        "shards.workspaces": {
+          "type": [
+            "array"
+          ],
+          "default": [
+            "./workspace.shlang"
+          ],
+          "description": "The shards workspaces to index. Workspace files are parsed and any other include files are added to the workspace index"
         }
       }
     },
@@ -42,7 +59,8 @@
           "shards"
         ],
         "extensions": [
-          ".shs"
+          ".shs",
+          ".shlang"
         ],
         "configuration": "./highlight/language-configuration.json"
       }
