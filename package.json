@@ -1,15 +1,15 @@
 {
-  "name": "shards-syntax",
-	"displayName": "Shards language support",
-	"description": "Language support for the Shards programming language.",
+  "name": "shards-formatter",
+	"displayName": "Shards formatter",
+	"description": "Formatter for the Shards programming language.",
 	"publisher": "fragcolor",
-  "url": "https://github.com/fragcolor-xyz/vscode-shards-syntax",
+  "url": "https://github.com/fragcolor-xyz/vscode-shards",
   "license": "BSD-3-Clause",
-  "version": "0.0.13",
+  "version": "0.0.1",
   "icon": "logo.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fragcolor-xyz/vscode-shards-syntax.git"
+    "url": "https://github.com/fragcolor-xyz/vscode-shards"
   },
   "engines": {
     "vscode": "^1.84.0"

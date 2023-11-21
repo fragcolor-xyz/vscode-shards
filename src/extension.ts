@@ -2,8 +2,6 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
-import { exists } from 'fs';
-// const cp = require('child_process')
 
 var outputChannel: vscode.OutputChannel;
 
@@ -60,13 +58,7 @@ async function provideDocumentFormattingEdits(document: vscode.TextDocument, opt
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vscode-shards-syntax" is now active!');
-
 	outputChannel = vscode.window.createOutputChannel("Shards", "shards");
-
 	vscode.languages.registerDocumentFormattingEditProvider('shards', { provideDocumentFormattingEdits });
 }
 
