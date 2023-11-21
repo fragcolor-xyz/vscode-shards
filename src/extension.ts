@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
+import * as os from 'os';
 
 var outputChannel: vscode.OutputChannel;
 
@@ -11,7 +12,11 @@ async function provideDocumentFormattingEdits(document: vscode.TextDocument, opt
 		outputChannel.appendLine(`Using shards path: ${shardsPath}`);
 
 		// Spawn the child process
-		const child = cp.spawn(shardsPath, ['format', '--', '-']);
+		// let wsFolder = vscode.workspace.getWorkspaceFolder(document.uri);
+		let cwd = /* wsFolder ? wsFolder.uri.fsPath : */ os.tmpdir();
+		const child = cp.spawn(shardsPath, ['format', '--', '-'], {
+			cwd: cwd,
+		});
 
 		// Handle stdout
 		let output = "";
