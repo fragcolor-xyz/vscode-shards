@@ -5,7 +5,7 @@
 	"publisher": "fragcolor",
   "url": "https://github.com/fragcolor-xyz/vscode-shards",
   "license": "BSD-3-Clause",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "icon": "logo.png",
   "repository": {
     "type": "git",
