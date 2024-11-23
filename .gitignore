@@ -6,3 +6,6 @@ node_modules/
 .shadow-cljs
 package-lock.json
 *.vsix
+.DS_Store
+out.sho
+shards.log
