@@ -7,3 +7,5 @@
 samples/**
 shadow-cljs.edn
 src
+*.log
+*.sho

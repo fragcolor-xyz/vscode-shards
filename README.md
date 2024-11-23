@@ -92,17 +92,6 @@ Make sure you're going to publish the required and only the required files:
 ```
 vsce ls
 ```
-As of writing, this is what we're publishing:
-```
-highlight/language-configuration.json
-highlight/shards.tmLanguage.edn
-highlight/shards.tmLanguage.json
-LICENSE
-logo.png
-out/extension.js
-package.json
-README.md
-```
 
 Bump the `version` number in `package.json` before publishing this extension, then:
 ```bash
