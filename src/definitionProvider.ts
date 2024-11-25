@@ -20,11 +20,11 @@ export class DefinitionProvider implements vscode.DefinitionProvider {
     const allSymbols = this.symbolProvider.getAllSymbols();
     console.log('Looking for definition of:', word);
     console.log('Available symbols:', allSymbols.map(s => ({ name: s.name, path: s.path })));
-    
+
     // Find all matching symbols (there might be multiple wire definitions)
     const targetSymbols = allSymbols.filter(symbol => symbol.name === word);
     console.log('Found matching symbols:', targetSymbols.length);
-    
+
     if (targetSymbols.length === 0) return undefined;
 
     // Convert symbols to locations

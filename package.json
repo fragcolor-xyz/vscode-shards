@@ -26,10 +26,18 @@
 		"configuration": {
 			"title": "Shards",
 			"properties": {
-				"shards.path": {
+				"shards.shardsPath": {
 					"type": "string",
-					"default": "/usr/local/bin/shards",
-					"description": "Full path to the 'shards' executable"
+					"default": "shards",
+					"description": "Path to the Shards executable"
+				},
+				"shards.includePaths": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					},
+					"default": [],
+					"description": "Additional include paths for Shards files (similar to -I compiler option)"
 				}
 			}
 		},

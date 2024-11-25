@@ -63,13 +63,27 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
 
   // Generates AST using the external shards CLI
   private async generateAST(filePath: string): Promise<any> {
-    const shardsPath = vscode.workspace.getConfiguration('shards').get<string>('shardsPath') || 'shards';
+    const config = vscode.workspace.getConfiguration('shards');
+    const shardsPath = config.get<string>('shardsPath') || 'shards';
+    const includePaths = config.get<string[]>('includePaths') || [];
+
     const tmpDir = os.tmpdir();
     const astFilePath = path.join(tmpDir, `ast-${Date.now()}.json`);
 
-    const cmd = `${shardsPath} ast "${filePath}" -o "${astFilePath}"`;
+    // Build include path arguments
+    const includeArgs = includePaths
+      .map(p => `-I "${p}"`)
+      .join(' ');
 
-    await execAsync(cmd, { cwd: tmpDir });
+    const cmd = `${shardsPath} ast "${filePath}" ${includeArgs} -o "${astFilePath}"`;
+    console.log('Executing command:', cmd); // Debug log
+
+    try {
+      await execAsync(cmd, { cwd: tmpDir });
+    } catch (error) {
+      console.error('Error executing shards command:', error);
+      throw error;
+    }
 
     if (!fs.existsSync(astFilePath)) {
       throw new Error(`AST file not generated at ${astFilePath}`);
