@@ -15,6 +15,11 @@ function debounce(func: Function, wait: number) {
   };
 }
 
+// Add this function near the top, after imports
+function shouldProcessDocument(document: vscode.TextDocument): boolean {
+  return document.uri.scheme !== 'output' && document.languageId === 'shards';
+}
+
 export async function activate(context: vscode.ExtensionContext) {
   initOutputChannel();
   log('Shards Extension is now active!');
@@ -40,7 +45,7 @@ export async function activate(context: vscode.ExtensionContext) {
     symbolProvider.clearCache();
     // Reparse all open documents
     for (const document of vscode.workspace.textDocuments) {
-      if (document.languageId === 'shards') {
+      if (shouldProcessDocument(document)) {
         await symbolProvider.updateDocumentSymbols(document);
       }
     }
@@ -49,8 +54,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Listen to document changes and trigger AST parsing
   const debouncedParse = debounce(async (document: vscode.TextDocument) => {
-    if (document.languageId !== 'shards') return;
-    log('Parsing document:', document.fileName); // Debug log
+    if (!shouldProcessDocument(document)) return;
+    log('Parsing document:', document.fileName);
     try {
       await symbolProvider.updateDocumentSymbols(document);
     } catch (error) {
@@ -64,7 +69,7 @@ export async function activate(context: vscode.ExtensionContext) {
     log("Parsing all open documents...");
     const docs = vscode.workspace.textDocuments;
     for (const doc of docs) {
-      if (doc.languageId === 'shards') {
+      if (shouldProcessDocument(doc)) {
         log("Initial parse of:", doc.fileName);
         await symbolProvider.updateDocumentSymbols(doc);
       }
@@ -81,7 +86,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Listen to document open events - parse immediately without debounce
   const openSubscription = vscode.workspace.onDidOpenTextDocument(async (document) => {
-    if (document.languageId === 'shards') {
+    if (shouldProcessDocument(document)) {
       log('Document opened, parsing immediately:', document.fileName);
       await symbolProvider.updateDocumentSymbols(document);
     }
@@ -89,7 +94,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Save events - parse immediately without debounce
   const saveSubscription = vscode.workspace.onDidSaveTextDocument(async (document) => {
-    if (document.languageId === 'shards') {
+    if (shouldProcessDocument(document)) {
       log('Document saved, parsing immediately:', document.fileName);
       await symbolProvider.updateDocumentSymbols(document);
     }
