@@ -66,27 +66,31 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
     const config = vscode.workspace.getConfiguration('shards');
     const shardsPath = config.get<string>('shardsPath') || 'shards';
     const includePaths = config.get<string[]>('includePaths') || [];
-
+    
     const tmpDir = os.tmpdir();
     const astFilePath = path.join(tmpDir, `ast-${Date.now()}.json`);
 
     // Build include path arguments
     const includeArgs = includePaths
-      .map(p => `-I "${p}"`)
-      .join(' ');
+        .map(p => `-I "${p}"`)
+        .join(' ');
 
     const cmd = `${shardsPath} ast "${filePath}" ${includeArgs} -o "${astFilePath}"`;
     console.log('Executing command:', cmd); // Debug log
 
+    // Get workspace folder for the current file
+    let workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(filePath));
+    let cwd = workspaceFolder ? workspaceFolder.uri.fsPath : path.dirname(filePath);
+
     try {
-      await execAsync(cmd, { cwd: tmpDir });
+        await execAsync(cmd, { cwd: cwd }); // Execute from workspace root or file directory
     } catch (error) {
-      console.error('Error executing shards command:', error);
-      throw error;
+        console.error('Error executing shards command:', error);
+        throw error;
     }
 
     if (!fs.existsSync(astFilePath)) {
-      throw new Error(`AST file not generated at ${astFilePath}`);
+        throw new Error(`AST file not generated at ${astFilePath}`);
     }
 
     const astContent = fs.readFileSync(astFilePath, 'utf8');
