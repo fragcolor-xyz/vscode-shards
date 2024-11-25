@@ -6,6 +6,7 @@ import { promisify } from 'util';
 import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
+import { log } from './log';
 
 // Promisify exec for async/await usage
 const execAsync = promisify(exec);
@@ -42,13 +43,13 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
   // Updates symbols for a given document
   async updateDocumentSymbols(document: vscode.TextDocument): Promise<void> {
     const filePath = document.fileName;
-    console.log(`Updating symbols for ${filePath}`);
+    log(`Updating symbols for ${filePath}`);
 
     try {
       const ast = await this.generateAST(filePath);
       const symbols = this.extractSymbols(ast, filePath);
       this.symbolCache.set(filePath, symbols);
-      console.log(`Updated cache for ${filePath}, total symbols: ${symbols.length}`);
+      log(`Updated cache for ${filePath}, total symbols: ${symbols.length}`);
       this._onDidChangeSymbols.fire();
     } catch (error) {
       console.error('Error generating AST:', error);
@@ -110,20 +111,20 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
       if (!node.func) return;
 
       const funcName = node.func.name;
-      console.log('Processing node:', funcName); // Debug log
+      log('Processing node:', funcName); // Debug log
 
       // Handle wire definitions
       if (funcName === 'wire') {
         const nameParam = node.func.params?.[0]?.id?.name;
         if (!nameParam) {
-          console.log('Wire found but no name parameter');
+          log('Wire found but no name parameter');
           return;
         }
 
         const line = (node.line_info?.line || 1) - 1;
         const column = (node.line_info?.column || 1) - 1;
 
-        console.log(`Found wire: ${nameParam} at line ${line}`); // Debug log
+        log(`Found wire: ${nameParam} at line ${line}`); // Debug log
 
         const range = new vscode.Range(
           new vscode.Position(line, column),
@@ -162,7 +163,7 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
     // Start visiting from the sequence
     visitNode(ast.sequence);
 
-    console.log(`Extracted ${symbols.length} symbols from ${filePath}`); // Debug log
+    log(`Extracted ${symbols.length} symbols from ${filePath}`); // Debug log
     return symbols;
   }
 
