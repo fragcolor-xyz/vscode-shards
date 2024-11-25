@@ -23,9 +23,9 @@ interface ShardsSymbol {
 // Mapping of custom kinds to VS Code SymbolKind
 const KIND_MAP: { [key: string]: vscode.SymbolKind } = {
   wire: vscode.SymbolKind.Function,
-  template: vscode.SymbolKind.Function,
-  define: vscode.SymbolKind.Function,
-  macro: vscode.SymbolKind.Function,
+  template: vscode.SymbolKind.Object,
+  define: vscode.SymbolKind.Constant,
+  macro: vscode.SymbolKind.TypeParameter,
   mesh: vscode.SymbolKind.Struct,
   // Add more mappings as needed
 };
@@ -114,7 +114,7 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
       log('Processing node:', funcName); // Debug log
 
       // Handle wire definitions
-      if (funcName === 'wire') {
+      if (funcName === 'wire' || funcName === 'template' || funcName === 'define' || funcName === 'macro') {
         const nameParam = node.func.params?.[0]?.id?.name;
         if (!nameParam) {
           log('Wire found but no name parameter');
@@ -133,7 +133,7 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
 
         symbols.push({
           name: nameParam,
-          kind: KIND_MAP.wire,
+          kind: KIND_MAP[funcName],
           range,
           selectionRange: range,
           path: filePath,

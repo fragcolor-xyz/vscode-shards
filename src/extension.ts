@@ -17,12 +17,15 @@ function debounce(func: Function, wait: number) {
 
 // Add this function near the top, after imports
 function shouldProcessDocument(document: vscode.TextDocument): boolean {
-  return document.uri.scheme !== 'output' && document.languageId === 'shards';
+  return document.uri.scheme === 'file' && document.languageId === 'shards';
 }
 
 export async function activate(context: vscode.ExtensionContext) {
   initOutputChannel();
   log('Shards Extension is now active!');
+
+  // Register the formatting provider
+	vscode.languages.registerDocumentFormattingEditProvider('shards', { provideDocumentFormattingEdits });
 
   // Initialize the symbol provider
   const symbolProvider = new SymbolProvider();

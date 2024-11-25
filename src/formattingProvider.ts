@@ -3,7 +3,7 @@ import * as cp from 'child_process';
 import * as os from 'os';
 import { log } from './log';
 export async function provideDocumentFormattingEdits(document: vscode.TextDocument, _options: vscode.FormattingOptions): Promise<vscode.TextEdit[]> {
-	let shardsPath = vscode.workspace.getConfiguration("shards").get<string>("path");
+	let shardsPath = vscode.workspace.getConfiguration("shards").get<string>("shardsPath");
 	if (shardsPath) {
 		log(`Using shards path: ${shardsPath}`);
 
