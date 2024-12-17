@@ -2,7 +2,7 @@
 	"name": "shards",
 	"displayName": "Shards Language Support",
 	"description": "Language support for the Shards programming language.",
-	"version": "2.2.0",
+	"version": "2.3.0",
 	"publisher": "fragcolor",
 	"repository": {
 		"type": "git",
