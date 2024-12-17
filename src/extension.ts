@@ -37,6 +37,26 @@ export async function activate(context: vscode.ExtensionContext) {
     { label: 'Shards' }
   );
 
+  // Add workspace symbol provider
+  const workspaceSymbolProvider = vscode.languages.registerWorkspaceSymbolProvider({
+    provideWorkspaceSymbols: async (query: string): Promise<vscode.SymbolInformation[]> => {
+      const allSymbols = symbolProvider.getAllSymbols();
+      const filteredSymbols = allSymbols.filter(symbol => 
+        symbol.name.toLowerCase().includes(query.toLowerCase())
+      );
+      
+      return filteredSymbols.map(symbol => new vscode.SymbolInformation(
+        symbol.name,
+        symbol.kind,
+        '',
+        new vscode.Location(
+          vscode.Uri.file(symbol.path),
+          symbol.range
+        )
+      ));
+    }
+  });
+
   const definitionProvider = new DefinitionProvider(symbolProvider);
   const defProviderDisposable = vscode.languages.registerDefinitionProvider(
     { scheme: 'file', language: 'shards' },
@@ -111,6 +131,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // Add workspaceFoldersChange to subscriptions
   context.subscriptions.push(
     documentSymbolProvider,
+    workspaceSymbolProvider,
     defProviderDisposable,
     reloadCommand,
     changeSubscription,
