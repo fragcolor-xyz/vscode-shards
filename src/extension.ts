@@ -82,8 +82,7 @@ export async function activate(context: vscode.ExtensionContext) {
     try {
       await symbolProvider.updateDocumentSymbols(document);
     } catch (error) {
-      console.error('Error updating document symbols:', error);
-      vscode.window.showErrorMessage('Shards Extension: Failed to update symbols.');
+      console.error('Error updating document symbols', document.fileName);
     }
   }, 500);
 
@@ -125,7 +124,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Changes can remain debounced
   const changeSubscription = vscode.workspace.onDidChangeTextDocument((event) => {
-    debouncedParse(event.document);
+    if(event.contentChanges.length > 0) {
+      debouncedParse(event.document);
+    }
   });
 
   // Add workspaceFoldersChange to subscriptions
@@ -137,7 +138,8 @@ export async function activate(context: vscode.ExtensionContext) {
     changeSubscription,
     saveSubscription,
     openSubscription,
-    workspaceFoldersChange
+    workspaceFoldersChange,
+    symbolProvider
   );
 }
 

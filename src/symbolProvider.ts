@@ -20,6 +20,13 @@ interface ShardsSymbol {
   path: string;
 }
 
+// Interface for error information
+interface ShardsError {
+  message: string;
+  line?: number;
+  column?: number;
+}
+
 // Mapping of custom kinds to VS Code SymbolKind
 const KIND_MAP: { [key: string]: vscode.SymbolKind } = {
   wire: vscode.SymbolKind.Function,
@@ -34,16 +41,27 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
   private symbolCache: Map<string, ShardsSymbol[]> = new Map();
   private _onDidChangeSymbols = new vscode.EventEmitter<void>();
   readonly onDidChangeSymbols = this._onDidChangeSymbols.event;
+  
+  // Add diagnostic collection for reporting errors
+  private diagnosticCollection: vscode.DiagnosticCollection;
+
+  constructor() {
+    this.diagnosticCollection = vscode.languages.createDiagnosticCollection('shards');
+  }
 
   // Clears the symbol cache
   clearCache() {
     this.symbolCache.clear();
+    this.diagnosticCollection.clear(); // Also clear diagnostics
   }
 
   // Updates symbols for a given document
   async updateDocumentSymbols(document: vscode.TextDocument): Promise<void> {
     const filePath = document.fileName;
     log(`Updating symbols for ${filePath}`);
+
+    // Clear existing diagnostics for this file
+    this.diagnosticCollection.delete(document.uri);
 
     try {
       const ast = await this.generateAST(filePath);
@@ -53,8 +71,70 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
       this._onDidChangeSymbols.fire();
     } catch (error) {
       console.error('Error generating AST:', error);
-      vscode.window.showErrorMessage('Shards Extension: Failed to update symbols.');
+      
+      // Parse the error and add it to the problems panel
+      this.reportError(document, error);
     }
+  }
+
+  // Parse error message and report to problems panel
+  private reportError(document: vscode.TextDocument, error: any): void {
+    const diagnostics: vscode.Diagnostic[] = [];
+    
+    // Try to extract meaningful error information
+    const errorInfo = this.parseErrorMessage(error.toString());
+    
+    // Create a diagnostic
+    const range = errorInfo.line !== undefined && errorInfo.column !== undefined
+      ? new vscode.Range(
+          errorInfo.line - 1, 
+          errorInfo.column - 1, 
+          errorInfo.line - 1, 
+          (errorInfo.column - 1) + 10
+        )
+      : new vscode.Range(0, 0, 0, 0);
+    
+    const diagnostic = new vscode.Diagnostic(
+      range,
+      errorInfo.message,
+      vscode.DiagnosticSeverity.Error
+    );
+    
+    diagnostic.source = 'Shards';
+    diagnostics.push(diagnostic);
+    
+    // Update the diagnostics for this document
+    this.diagnosticCollection.set(document.uri, diagnostics);
+  }
+
+  // Parse error messages to extract line and column information
+  private parseErrorMessage(errorMessage: string): ShardsError {
+    log(`Parsing error message: ${errorMessage}`);
+    
+    // Default error info
+    const errorInfo: ShardsError = {
+      message: "Parsing error in Shards file"
+    };
+    
+    // Parse ShardsError format
+    // Match pattern like: ShardsError { message: "error message", loc: LineInfo { line: 123, column: 45 } }
+    const messageMatch = errorMessage.match(/ShardsError\s*{\s*message:\s*"([^"]+)"/);
+    if (messageMatch && messageMatch[1]) {
+      errorInfo.message = messageMatch[1];
+    }
+    
+    const lineMatch = errorMessage.match(/line:\s*(\d+)/);
+    if (lineMatch && lineMatch[1]) {
+      errorInfo.line = parseInt(lineMatch[1], 10);
+    }
+    
+    const columnMatch = errorMessage.match(/column:\s*(\d+)/);
+    if (columnMatch && columnMatch[1]) {
+      errorInfo.column = parseInt(columnMatch[1], 10);
+    }
+    
+    log(`Parsed error: Line ${errorInfo.line}, Column ${errorInfo.column}, Message: ${errorInfo.message}`);
+    return errorInfo;
   }
 
   // Retrieves symbols from the cache
@@ -84,10 +164,17 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
     let cwd = workspaceFolder ? workspaceFolder.uri.fsPath : path.dirname(filePath);
 
     try {
-        await execAsync(cmd, { cwd: cwd }); // Execute from workspace root or file directory
-    } catch (error) {
+        const { stdout, stderr } = await execAsync(cmd, { cwd: cwd, env: { LOG_FORMAT: '%v' }});
+        
+        if (stderr && stderr.trim().length > 0) {
+            log(`Command stderr: ${stderr}`);
+        }
+    } catch (error: any) {
         console.error('Error executing shards command:', error);
-        throw error;
+        // Capture both the error message and any stderr output
+        const errorMessage = error.message || 'Unknown error';
+        const stderr = error.stderr || '';
+        throw new Error(`${errorMessage}\n${stderr}`);
     }
 
     if (!fs.existsSync(astFilePath)) {
@@ -192,5 +279,10 @@ export class SymbolProvider implements vscode.DocumentSymbolProvider {
       allSymbols.push(...symbols);
     }
     return allSymbols;
+  }
+
+  // Cleanup method to dispose resources
+  dispose() {
+    this.diagnosticCollection.dispose();
   }
 }
