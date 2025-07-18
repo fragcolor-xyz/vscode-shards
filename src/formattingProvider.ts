@@ -12,6 +12,9 @@ export async function provideDocumentFormattingEdits(document: vscode.TextDocume
 		let cwd = /* wsFolder ? wsFolder.uri.fsPath : */ os.tmpdir();
 		const child = cp.spawn(shardsPath, ['format', '--', '-'], {
 			cwd: cwd,
+			env: {
+				SHARDS_LOG_FILE: 'shards-format.log',
+			}
 		});
 
 		// Handle stdout
