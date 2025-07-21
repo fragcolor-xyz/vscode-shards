@@ -5,6 +5,7 @@ import { SymbolProvider } from './symbolProvider';
 import { DefinitionProvider } from './definitionProvider';
 import { provideDocumentFormattingEdits } from './formattingProvider';
 import { initOutputChannel, log } from './log';
+import { ShardsRemoteDebugAdapterServerDescriptorFactory } from './debugAdapter';
 
 // Debounce utility to prevent rapid consecutive calls
 function debounce(func: Function, wait: number) {
@@ -128,6 +129,8 @@ export async function activate(context: vscode.ExtensionContext) {
       debouncedParse(event.document);
     }
   });
+
+	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('shards', new ShardsRemoteDebugAdapterServerDescriptorFactory()));
 
   // Add workspaceFoldersChange to subscriptions
   context.subscriptions.push(
