@@ -3,16 +3,14 @@ import * as Net from 'net';
 
 class ShardsRemoteDebugAdapterServerDescriptorFactory implements vscode.DebugAdapterDescriptorFactory {
 
-	createDebugAdapterDescriptor(_session: vscode.DebugSession, _executable: vscode.DebugAdapterExecutable | undefined): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
+	createDebugAdapterDescriptor(session: vscode.DebugSession, _executable: vscode.DebugAdapterExecutable | undefined): vscode.ProviderResult<vscode.DebugAdapterDescriptor> {
 
-		// make VS Code connect to debug server
-    let testAddress = "127.0.0.1";
-    // Using 57427 (SHARD on a phone keypad)
-    let testPort = 57427;
+		// Get port and address from session configuration, with defaults
+		const port = session.configuration.port || 57427;
+		const address = session.configuration.address || "127.0.0.1";
 
-    // _session.configuration.
-
-		return new vscode.DebugAdapterServer(testPort, testAddress);
+		// Make VS Code connect to debug server
+		return new vscode.DebugAdapterServer(port, address);
 	}
 }
 
