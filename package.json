@@ -99,6 +99,16 @@
 								"type": "string",
 								"description": "Debug server address.",
 								"default": "127.0.0.1"
+							},
+							"maxRetries": {
+								"type": "number",
+								"description": "Maximum number of connection attempts before giving up.",
+								"default": 10
+							},
+							"retryInterval": {
+								"type": "number",
+								"description": "Time to wait between connection attempts (in milliseconds).",
+								"default": 2000
 							}
 						}
 					}
@@ -109,7 +119,9 @@
 						"request": "attach",
 						"name": "Attach to Shards Debug Server",
 						"port": 57427,
-						"address": "127.0.0.1"
+						"address": "127.0.0.1",
+						"maxRetries": 10,
+						"retryInterval": 2000
 					}
 				],
 				"configurationSnippets": [
@@ -121,7 +133,9 @@
 							"request": "attach",
 							"name": "Attach to Shards Debug Server",
 							"port": 57427,
-							"address": "127.0.0.1"
+							"address": "127.0.0.1",
+							"maxRetries": 10,
+							"retryInterval": 2000
 						}
 					}
 				],
