@@ -29,22 +29,80 @@ class ShardsRemoteDebugAdapterServerDescriptorFactory implements vscode.DebugAda
 		});
 	}
 
-	private async waitForConnection(address: string, port: number, maxRetries: number, retryInterval: number): Promise<boolean> {
-		for (let attempt = 1; attempt <= maxRetries; attempt++) {
-			const connected = await this.checkConnection(address, port);
-			
-			if (connected) {
-				vscode.window.showInformationMessage(`Connected to Shards debug server at ${address}:${port} (attempt ${attempt}/${maxRetries})`);
-				return true;
-			}
+	private async waitForConnection(
+		address: string, 
+		port: number, 
+		maxRetries: number, 
+		retryInterval: number
+	): Promise<boolean> {
+		return new Promise((resolve) => {
+			vscode.window.withProgress(
+				{
+					location: vscode.ProgressLocation.Notification,
+					title: "Shards Debug Connection",
+					cancellable: true
+				},
+				async (progress, token) => {
+					let attempt = 1;
+					let cancelled = false;
 
-			if (attempt < maxRetries) {
-				vscode.window.showInformationMessage(`Waiting for Shards debug server at ${address}:${port} (attempt ${attempt}/${maxRetries})...`);
-				await new Promise(resolve => setTimeout(resolve, retryInterval));
-			}
-		}
+					// Handle cancellation
+					token.onCancellationRequested(() => {
+						cancelled = true;
+						vscode.window.showWarningMessage('Debug connection attempt cancelled');
+						resolve(false);
+					});
 
-		return false;
+					// Initial progress report
+					progress.report({ 
+						increment: 0, 
+						message: `Connecting to ${address}:${port}...` 
+					});
+
+					while (attempt <= maxRetries && !cancelled) {
+						const connected = await this.checkConnection(address, port);
+						
+						if (connected) {
+							progress.report({ 
+								increment: 100, 
+								message: `Connected successfully!` 
+							});
+							vscode.window.showInformationMessage(`Connected to Shards debug server at ${address}:${port}`);
+							resolve(true);
+							return;
+						}
+
+						// Calculate progress percentage
+						const progressPercent = (attempt / maxRetries) * 100;
+						const increment = progressPercent - ((attempt - 1) / maxRetries) * 100;
+
+						if (attempt < maxRetries) {
+							progress.report({ 
+								increment: increment, 
+								message: `Attempt ${attempt}/${maxRetries} failed. Retrying in ${retryInterval/1000}s...` 
+							});
+							
+							// Wait for retry interval, but check for cancellation periodically
+							const startTime = Date.now();
+							while (Date.now() - startTime < retryInterval && !cancelled) {
+								await new Promise(resolve => setTimeout(resolve, 100));
+							}
+						} else {
+							progress.report({ 
+								increment: increment, 
+								message: `All attempts failed` 
+							});
+						}
+
+						attempt++;
+					}
+
+					if (!cancelled) {
+						resolve(false);
+					}
+				}
+			);
+		});
 	}
 
 	async createDebugAdapterDescriptor(session: vscode.DebugSession, _executable: vscode.DebugAdapterExecutable | undefined): Promise<vscode.DebugAdapterDescriptor | null> {
