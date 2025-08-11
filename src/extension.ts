@@ -6,6 +6,7 @@ import { DefinitionProvider } from './definitionProvider';
 import { provideDocumentFormattingEdits } from './formattingProvider';
 import { initOutputChannel, log } from './log';
 import { ShardsRemoteDebugAdapterServerDescriptorFactory } from './debugAdapter';
+import { ShardsRuntimeInstancesProvider } from './runtimeInstancesProvider';
 
 // Debounce utility to prevent rapid consecutive calls
 function debounce(func: Function, wait: number) {
@@ -76,6 +77,11 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.showInformationMessage('Shards Extension reloaded.');
   });
 
+  // Register the show runtime instances command
+  const showRuntimeInstancesCommand = vscode.commands.registerCommand('shards.showRuntimeInstances', () => {
+    vscode.commands.executeCommand('workbench.view.extension.shardsRuntimeInstances');
+  });
+
   // Listen to document changes and trigger AST parsing
   const debouncedParse = debounce(async (document: vscode.TextDocument) => {
     if (!shouldProcessDocument(document)) return;
@@ -132,17 +138,25 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('shards', new ShardsRemoteDebugAdapterServerDescriptorFactory()));
 
+  // Register the Shards Runtime Instances webview provider
+  const runtimeInstancesProvider = new ShardsRuntimeInstancesProvider(context.extensionUri);
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(ShardsRuntimeInstancesProvider.viewType, runtimeInstancesProvider)
+  );
+
   // Add workspaceFoldersChange to subscriptions
   context.subscriptions.push(
     documentSymbolProvider,
     workspaceSymbolProvider,
     defProviderDisposable,
     reloadCommand,
+    showRuntimeInstancesCommand,
     changeSubscription,
     saveSubscription,
     openSubscription,
     workspaceFoldersChange,
-    symbolProvider
+    symbolProvider,
+    runtimeInstancesProvider
   );
 }
 

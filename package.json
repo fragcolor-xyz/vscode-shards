@@ -70,8 +70,32 @@
 			{
 				"command": "shards.reload",
 				"title": "Reload Shards Extension"
+			},
+			{
+				"command": "shards.showRuntimeInstances",
+				"title": "Show Runtime Instances",
+				"icon": "$(debug-alt)"
 			}
 		],
+		"views": {
+			"explorer": [
+				{
+					"id": "shardsRuntimeInstances",
+					"name": "Shards Runtime Instances",
+					"type": "webview",
+					"when": "true"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "shards.showRuntimeInstances",
+					"when": "view == shardsRuntimeInstances",
+					"group": "navigation"
+				}
+			]
+		},
 		"breakpoints": [
 			{
 				"language": "shards"
