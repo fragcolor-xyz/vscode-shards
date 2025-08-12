@@ -1,123 +1,54 @@
 # vscode-shards ![License: BSD 3-Clause](https://img.shields.io/badge/license-BSD%203--Clause-blue.svg)
 
-[Shards](https://github.com/fragcolor-xyz/shards) language Support in VSCode.
+[Shards](https://github.com/fragcolor-xyz/shards) language support for Visual Studio Code.
 
-This extension provides comprehensive support for the Shards programming language in Visual Studio Code. Developed in `TypeScript` and `tmLanguage`, the extension offers:
+![Shards VSCode Extension](example.png)
 
-- [x] Syntax highlighting
-- [x] Custom shards path
-- [x] Go to definitions
-  - [x] Wires
-    - [x] Cross-file
-  - [ ] Variables
-  - [x] @define
-  - [x] @template
-  - [x] macro
-  - [x] mesh
-- [ ] Go to references
-- [x] Outline
-  - [x] Meshes with go to definitions
-  - [x] Wire definitions with go to definitions
-    - [ ] Variable definitions with go definitions
-    - [ ] Wire references (activator type too?) with go to definitions
-- [ ] Red file on:
-  - [ ] no ast
-  - [ ] duplicate wire definitions
-- [ ] Red squiggle under duplicate wire definitions
-- [ ] Warnings:
-  - [ ] Shards executable wasn't found. Try to show only once, in case user only wants syntax highlighting.
 
-## Install extension
+## Key Features
 
-Grab it from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=fragcolor.shards), or issue the command:
-```
-code --install-extension fragcolor.shards
-```
-You could also copy this repo or just copy the relevant files to `<user home>/.vscode/extensions` folder in VS Code. Check the relevant files with `vsce ls`.
+- **Syntax Highlighting** - Rich syntax highlighting for `.shs` files
+- **Go to Definition** - Navigate to wire definitions, @define, @template, macro, and mesh declarations
+- **Document Outline** - View and navigate meshes and wire definitions in the outline
+- **Debugging Support** - Debug Shards programs directly in VS Code
+- **Cross-file Navigation** - Jump to definitions across multiple files
 
-## Usage
+## Quick Setup
 
-1. Setup full path to shards executable in the settings: search for "shards"
-2. Open any `.shs` file to activate the extension.
+1. **Install the extension** from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=fragcolor.shards) or run:
+   ```
+   code --install-extension fragcolor.shards
+   ```
+
+2. **Configure Shards path** in VS Code settings:
+   - Open Settings (Ctrl+,)
+   - Search for "shards"
+   - Set `shards.shardsPath` to your Shards executable path, for example:
+     ```json
+     "shards.shardsPath": "C:/Projects/shards/build/clang-x86_64-pc-windows-msvc/debug/shards.exe"
+     ```
+
+3. **Start using** - Open any `.shs` file to activate the extension
+
+## Features Overview
+
+- **Syntax Highlighting** - Rich syntax highlighting with proper tokenization
+- **Go to Definition** - Navigate to definitions for wires, @define, @template, macro, and mesh
+- **Document Outline** - Browse code structure with meshes and wire definitions
+- **Cross-file Support** - Navigate definitions across multiple files
 
 ## Development
 
-Development using TypeScript and VS Code debugger.
+For developers wanting to contribute or modify the extension:
 
-Install dependencies:
-```bash
-npm install
-```
+1. Install dependencies: `npm install`
+2. Compile in watch mode: `npm run compile`
+3. Debug: Go to _Run_ → _Start Debugging_ to test the extension
 
-Compile in watch mode:
-```bash
-npm run compile
-```
-
-### Debug extension
-
-#### Start debugger
-Start debugging this extension:
-
-- Go to _Run_ *->* _Start Debugging_ to open a new window with your extension loaded.
-- Set breakpoints in your code inside `src/extension.ts` to debug your extension.
-
-#### Test functionality
-
-**Syntax highlighting**: Verify code is highlighted and that the language configuration settings are working. Try with `shards*.shs` files. To inspect tokens and scopes for syntax highlighting, go to VS Code command palette, and run `Developer: Inspect Editor Tokens and Scopes`.
-
-**Go to definition**: Try with `test*.shs` files.
-
-**Shards path**: Go to settings, look for shards, setup a non-default path for shards and test with a **go to definition**.
-
-#### Making changes
-
-When making changes to `shards.tmLanguage.edn`, generate `shards.tmLanguage.json` using a tool like [jet](https://github.com/borkdude/jet), here as:
-```bash
-cat shards.tmLanguage.edn |jet --to=json > shards.tmLanguage.json
-```
-
-#### Reload extension
-
-Reload (`Ctrl+R` or `Cmd+R` on Mac) the VS Code window with your extension to load your changes. Otherwise, relaunch the extension from the debug toolbar.
-
-### Publish this extension
-
-Build code for release:
-```bash
-npm run compile
-```
-
-Make sure you're going to publish the required and only the required files:
-```
-vsce ls
-```
-
-Bump the `version` number in `package.json` before publishing this extension, then:
-```bash
-vsce package
-```
-Finally, upload the generated `.vsix` file to the [Fragcolor's VS Code marketplace](https://marketplace.visualstudio.com/manage/publishers/fragcolor) if you're a member of the organization, or in your own stall.
-
-## What's in the folder?
-
-The `package.json` file is the entry point of the extension.
-
-### tmLanguage syntax highlighting
-
-The [highlight](highlight) folder contains all of the files necessary for syntax highlighting.
-
-- `package.json` - this is the manifest file declaring language support and locating the grammar file.
-- `shards.tmLanguage.json` - this is the Text mate grammar file that is used for tokenization, generated from `shards.tmLanguage.edn`.
-- `language-configuration.json` - this is the language configuration, defining the tokens that are used for comments and brackets.
-
-### Language Support in TypeScript
-
-The [src](src) folder contains the TypeScript code implementing the language features:
-
-- `extension.ts` - Main extension activation and setup
-- `definitionProvider.ts` - Implements go-to-definition functionality
-- `symbolProvider.ts` - Implements document symbol outline functionality
+The extension is built with TypeScript and includes:
+- Syntax highlighting via TextMate grammar
+- Language features (go-to-definition, outline, debugging)
+- Integration with the Shards executable
 
 ## Contributing
 
