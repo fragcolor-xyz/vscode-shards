@@ -18,7 +18,7 @@ export class ShardsDiscoveryService {
     private callbacks: ((instances: ShardsRuntimeInstance[]) => void)[] = [];
     private instanceTimeouts = new Map<string, NodeJS.Timeout>();
     private readonly DISCOVERY_PORT = 57426;
-    private readonly INSTANCE_TIMEOUT = 30000; // 30 seconds timeout
+    private readonly INSTANCE_TIMEOUT = 6000; // 6 seconds timeout
 
     constructor() {
         this.startListening();

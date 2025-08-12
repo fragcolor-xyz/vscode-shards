@@ -67,7 +67,7 @@ class ShardsRemoteDebugAdapterServerDescriptorFactory implements vscode.DebugAda
 								increment: 100, 
 								message: `Connected successfully!` 
 							});
-							vscode.window.showInformationMessage(`Connected to Shards debug server at ${address}:${port}`);
+							// vscode.window.showInformationMessage(`Connected to Shards debug server at ${address}:${port}`);
 							resolve(true);
 							return;
 						}

@@ -83,11 +83,6 @@ export class ShardsRuntimeInstancesProvider implements vscode.TreeDataProvider<S
     }
 
     public attachToInstance(instance: ShardsRuntimeInstance) {
-        if (!instance.isRunning) {
-            vscode.window.showWarningMessage(`Runtime instance "${instance.name}" is not running`);
-            return;
-        }
-
         // Create debug configuration
         const debugConfig: vscode.DebugConfiguration = {
             type: 'shards',
@@ -112,12 +107,6 @@ export class ShardsRuntimeInstancesProvider implements vscode.TreeDataProvider<S
                 vscode.window.showErrorMessage(`Error attaching to "${instance.name}": ${error.message}`);
             }
         );
-    }
-
-    public refresh() {
-        // Refresh the discovery service
-        this._discoveryService.refresh();
-        vscode.window.showInformationMessage('Refreshing Shards runtime instances...');
     }
 
     public async selectAndAttachToInstance() {
@@ -147,26 +136,6 @@ export class ShardsRuntimeInstancesProvider implements vscode.TreeDataProvider<S
             this.attachToInstance(selectedItem.instance);
         }
     }
-
-    public addInstance(instance: ShardsRuntimeInstance) {
-        this._instances.push(instance);
-        this._onDidChangeTreeData.fire();
-    }
-
-    public removeInstance(instanceId: string) {
-        this._instances = this._instances.filter(i => i.id !== instanceId);
-        this._onDidChangeTreeData.fire();
-    }
-
-    public updateInstanceStatus(instanceId: string, isRunning: boolean) {
-        const instance = this._instances.find(i => i.id === instanceId);
-        if (instance) {
-            instance.isRunning = isRunning;
-            this._onDidChangeTreeData.fire();
-        }
-    }
-
-
 
     public dispose() {
         this._discoveryService.dispose();
