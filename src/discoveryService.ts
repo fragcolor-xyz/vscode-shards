@@ -4,16 +4,11 @@ import { log } from './log';
 
 export interface ShardsDiscoveryMessage {
     service: string;
-    instance: {
-        name: string;
-        port: number;
-        protocol: string;
-        args?: string;
-    };
     version: string;
-    capabilities: {
-        [key: string]: boolean;
-    };
+    name: string;
+    cmd: string;
+    port: number;
+    timestamp: number;
 }
 
 export class ShardsDiscoveryService {
@@ -85,7 +80,15 @@ export class ShardsDiscoveryService {
             const announcement: ShardsDiscoveryMessage = JSON.parse(message);
             
             if (announcement.service === 'shards-debug-adapter') {
+                // Validate required fields for new format
+                if (!announcement.name || !announcement.port || !announcement.cmd || !announcement.timestamp) {
+                    log(`Invalid announcement from ${fromAddress}: missing required fields (name, port, cmd, timestamp)`);
+                    return;
+                }
+                
                 this.processDiscoveryAnnouncement(announcement, fromAddress);
+            } else {
+                log(`Ignoring non-Shards service announcement from ${fromAddress}: ${announcement.service}`);
             }
         } catch (error) {
             // Ignore invalid JSON or non-Shards messages
@@ -94,19 +97,24 @@ export class ShardsDiscoveryService {
     }
 
     private processDiscoveryAnnouncement(announcement: ShardsDiscoveryMessage, fromAddress: string) {
-        const instanceKey = `${fromAddress}:${announcement.instance.port}`;
+        const instanceKey = `${fromAddress}:${announcement.port}`;
         
         // Create or update instance
         const instance: ShardsRuntimeInstance = {
             id: instanceKey,
-            name: announcement.instance.name || `Shards Instance (${announcement.instance.port})`,
-            executableArgs: announcement.instance.args || 'shards run --debug',
-            port: announcement.instance.port,
+            name: announcement.name || `Shards Instance (${announcement.port})`,
+            executableArgs: announcement.cmd || 'shards run --debug',
+            port: announcement.port,
             ipAddress: fromAddress,
             isRunning: true
         };
 
-        log(`Discovered Shards instance: ${instance.name} at ${fromAddress}:${announcement.instance.port}`);
+        // Calculate announcement age for better timeout management
+        const now = Date.now();
+        const announcementAge = now - announcement.timestamp;
+        const adjustedTimeout = Math.max(this.INSTANCE_TIMEOUT - announcementAge, 5000); // Minimum 5 seconds
+        
+        log(`Discovered Shards instance: ${instance.name} at ${fromAddress}:${announcement.port} (age: ${announcementAge}ms, timeout: ${adjustedTimeout}ms)`);
 
         // Update or add instance
         this.discoveredInstances.set(instanceKey, instance);
@@ -118,9 +126,10 @@ export class ShardsDiscoveryService {
         }
 
         // Set new timeout to mark instance as stopped if no more announcements
+        
         const timeout = setTimeout(() => {
             this.markInstanceAsStopped(instanceKey);
-        }, this.INSTANCE_TIMEOUT);
+        }, adjustedTimeout);
         
         this.instanceTimeouts.set(instanceKey, timeout);
 

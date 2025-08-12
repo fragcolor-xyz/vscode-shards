@@ -77,9 +77,22 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.showInformationMessage('Shards Extension reloaded.');
   });
 
+  // Register the Shards Runtime Instances tree view provider first
+  const runtimeInstancesProvider = new ShardsRuntimeInstancesProvider();
+
   // Register the show runtime instances command
   const showRuntimeInstancesCommand = vscode.commands.registerCommand('shards.showRuntimeInstances', () => {
     vscode.commands.executeCommand('workbench.view.extension.shardsRuntimeInstances');
+  });
+
+  // Register the attach to instance command
+  const attachToInstanceCommand = vscode.commands.registerCommand('shards.attachToInstance', (instance) => {
+    runtimeInstancesProvider.attachToInstance(instance);
+  });
+
+  // Register the select and attach to instance command
+  const selectAndAttachToInstanceCommand = vscode.commands.registerCommand('shards.selectAndAttachToInstance', async () => {
+    await runtimeInstancesProvider.selectAndAttachToInstance();
   });
 
   // Listen to document changes and trigger AST parsing
@@ -138,10 +151,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.debug.registerDebugAdapterDescriptorFactory('shards', new ShardsRemoteDebugAdapterServerDescriptorFactory()));
 
-  // Register the Shards Runtime Instances webview provider
-  const runtimeInstancesProvider = new ShardsRuntimeInstancesProvider(context.extensionUri);
+  // Register the tree view
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(ShardsRuntimeInstancesProvider.viewType, runtimeInstancesProvider)
+    vscode.window.createTreeView('shardsRuntimeInstances', {
+      treeDataProvider: runtimeInstancesProvider,
+      showCollapseAll: false
+    })
   );
 
   // Add workspaceFoldersChange to subscriptions
@@ -151,6 +166,8 @@ export async function activate(context: vscode.ExtensionContext) {
     defProviderDisposable,
     reloadCommand,
     showRuntimeInstancesCommand,
+    attachToInstanceCommand,
+    selectAndAttachToInstanceCommand,
     changeSubscription,
     saveSubscription,
     openSubscription,

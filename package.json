@@ -69,30 +69,45 @@
 		"commands": [
 			{
 				"command": "shards.reload",
-				"title": "Reload Shards Extension"
+				"title": "Shards: Reload Extension"
 			},
 			{
 				"command": "shards.showRuntimeInstances",
-				"title": "Show Runtime Instances",
+				"title": "Shards: Show Runtime Instances",
+				"icon": "$(debug-alt)"
+			},
+
+
+			{
+				"command": "shards.selectAndAttachToInstance",
+				"title": "Shards: Select and Attach to Instance",
 				"icon": "$(debug-alt)"
 			}
 		],
+		"viewsContainers": {
+			"panel": [
+				{
+					"id": "shards",
+					"title": "Shards",
+					"icon": "$(debug-alt)"
+				}
+			]
+		},
 		"views": {
-			"explorer": [
+			"shards": [
 				{
 					"id": "shardsRuntimeInstances",
-					"name": "Shards Runtime Instances",
-					"type": "webview",
+					"name": "Runtime Instances",
 					"when": "true"
 				}
 			]
 		},
 		"menus": {
-			"view/title": [
+			"view/item/context": [
 				{
-					"command": "shards.showRuntimeInstances",
-					"when": "view == shardsRuntimeInstances",
-					"group": "navigation"
+					"command": "shards.attachToInstance",
+					"when": "view == shardsRuntimeInstances && viewItem == runtimeInstance",
+					"group": "inline"
 				}
 			]
 		},
@@ -171,8 +186,9 @@
 	},
 	"main": "./out/extension.js",
 	"scripts": {
-		"vscode:prepublish": "tsc -p ./",
+		"vscode:prepublish": "npm run compile-prod",
 		"compile": "tsc -watch -p ./",
+		"compile-prod": "tsc -p ./",
 		"lint": "eslint src --ext ts"
 	},
 	"devDependencies": {
