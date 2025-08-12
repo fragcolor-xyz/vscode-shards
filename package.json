@@ -76,8 +76,11 @@
 				"title": "Shards: Show Runtime Instances",
 				"icon": "$(debug-alt)"
 			},
-
-
+			{
+				"command": "shards.attachToInstance",
+				"title": "Attach Debugger",
+				"icon": "$(debug-alt)"
+			},
 			{
 				"command": "shards.selectAndAttachToInstance",
 				"title": "Shards: Select and Attach to Instance",
@@ -103,6 +106,12 @@
 			]
 		},
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "shards.attachToInstance",
+					"when": "false"
+				}
+			],
 			"view/item/context": [
 				{
 					"command": "shards.attachToInstance",
