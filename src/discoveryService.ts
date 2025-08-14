@@ -40,7 +40,11 @@ export class ShardsDiscoveryService {
         }
 
         try {
-            this.socket = dgram.createSocket('udp4');
+            // Create socket with reuseAddr option to allow multiple listeners
+            this.socket = dgram.createSocket({ 
+                type: 'udp4', 
+                reuseAddr: true 
+            });
             
             this.socket.on('error', (err) => {
                 log(`Discovery service error: ${err.message}`);
@@ -59,11 +63,12 @@ export class ShardsDiscoveryService {
                 this.isListening = true;
             });
 
-            // Set socket options
+            // Bind to the discovery port with address reuse enabled
             this.socket.bind(this.DISCOVERY_PORT, () => {
                 try {
                     this.socket?.setMulticastTTL(128);
-                    this.socket?.setBroadcast(true);
+                    // this.socket?.setBroadcast(true);
+                    log(`Discovery service successfully bound to port ${this.DISCOVERY_PORT} with socket reuse enabled`);
                 } catch (err) {
                     log(`Warning: Could not set socket options: ${err}`);
                 }
