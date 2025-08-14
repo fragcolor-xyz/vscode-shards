@@ -86,8 +86,8 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   // Register the attach to instance command
-  const attachToInstanceCommand = vscode.commands.registerCommand('shards.attachToInstance', (instance) => {
-    runtimeInstancesProvider.attachToInstance(instance);
+  const attachToInstanceCommand = vscode.commands.registerCommand('shards.attachToInstance', (arg) => {
+    runtimeInstancesProvider.attachToInstance(arg.instance);
   });
 
   // Register the select and attach to instance command

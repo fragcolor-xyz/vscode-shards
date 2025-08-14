@@ -87,10 +87,10 @@ export class ShardsRuntimeInstancesProvider implements vscode.TreeDataProvider<S
         const debugConfig: vscode.DebugConfiguration = {
             type: 'shards',
             request: 'attach',
-            name: `Attach to ${instance.name}`,
+            name: `Attach to ${instance.name} (${instance.ipAddress})`,
             port: instance.port,
             address: instance.ipAddress,
-            maxRetries: 10,
+            maxRetries: 1,
             retryInterval: 2000
         };
 
