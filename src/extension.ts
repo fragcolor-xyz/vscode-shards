@@ -83,7 +83,7 @@ export async function activate(context: vscode.ExtensionContext) {
   // Register the show runtime instances command
   const showRuntimeInstancesCommand = vscode.commands.registerCommand('shards.showRuntimeInstances', () => {
     vscode.commands.executeCommand('shardsRuntimeInstances.focus');
-  });
+  }); 
 
   // Register the attach to instance command
   const attachToInstanceCommand = vscode.commands.registerCommand('shards.attachToInstance', (arg) => {

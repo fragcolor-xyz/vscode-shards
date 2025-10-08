@@ -29,7 +29,7 @@ export class ShardsRuntimeInstanceTreeItem extends vscode.TreeItem {
             this.command = {
                 command: 'shards.attachToInstance',
                 title: 'Attach Debugger',
-                arguments: [instance]
+                arguments: [{ instance: instance }]
             };
         }
     }
