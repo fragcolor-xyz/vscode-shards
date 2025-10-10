@@ -1,7 +1,9 @@
 {
     "comments": {
-        // symbol used for single line comment. Remove this entry if your language does not support line comments
-        "lineComment": ";"
+        // symbols used for single line comments (both ; and // are valid, but only one can be the default for toggle)
+        "lineComment": "//",
+        // symbols used for block comments
+        "blockComment": ["/*", "*/"]
     },
     // symbols used as brackets
     "brackets": [

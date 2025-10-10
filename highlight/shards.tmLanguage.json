@@ -78,8 +78,21 @@
       ]
     },
     "comments": {
-      "name": "comment.line.semicolon.shards",
-      "match": ";.*"
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.shards",
+          "match": "//.*"
+        },
+        {
+          "name": "comment.line.semicolon.shards",
+          "match": ";.*"
+        },
+        {
+          "name": "comment.block.shards",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
     },
     "commas": {
       "name": "punctuation.separator.comma.shards",
